@@ -55,6 +55,15 @@ selected_price_range = st.sidebar.slider(
     value=(min_price, 500),  # default upper bound at 500, same as your EDA df_viz
 )
 
+# --- Apply filters to the dataframe ---
+# This filtered dataframe will be reused across all tabs
+df_filtered = df[
+    (df["neighbourhood_group"].isin(selected_districts))
+    & (df["room_type"].isin(selected_room_types))
+    & (df["price"] >= selected_price_range[0])
+    & (df["price"] <= selected_price_range[1])
+]
+
 # --- Main title ---
 st.title("🏠 Madrid Airbnb Dashboard")
 st.caption("Análisis enriquecido con datos de renta, población, alquiler y VUT por distrito")
@@ -65,7 +74,18 @@ tab_summary, tab_price, tab_income = st.tabs(
 )
 
 with tab_summary:
-    st.write("KPIs generales — próximo paso")
+    st.subheader("Indicadores generales")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric("Nº de alojamientos", f"{len(df_filtered):,}")
+    col2.metric("Precio medio", f"{df_filtered['price'].mean():.0f} €")
+    col3.metric("Precio mediana", f"{df_filtered['price'].median():.0f} €")
+    col4.metric("Distritos representados", df_filtered["neighbourhood_group"].nunique())
+
+    st.divider()
+    st.write("Vista previa de los datos filtrados:")
+    st.dataframe(df_filtered.head(10))
 
 with tab_price:
     st.write("Análisis de precios por distrito — próximo paso")
