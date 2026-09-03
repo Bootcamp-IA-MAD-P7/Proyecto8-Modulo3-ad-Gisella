@@ -3,4 +3,5 @@ numpy
 matplotlib
 seaborn
 plotly
-jupyter 
+jupyter
+streamlit 
