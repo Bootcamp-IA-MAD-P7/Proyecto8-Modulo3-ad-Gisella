@@ -6,6 +6,7 @@ Entry point of the application.
 
 from pathlib import Path
 
+from scipy.stats import pearsonr
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -111,4 +112,61 @@ with tab_price:
     st.plotly_chart(fig_box, use_container_width=True)
 
 with tab_income:
-    st.write("Relación precio vs renta/población — próximo paso")
+    st.subheader("Relación entre precio y variables socioeconómicas")
+
+    variable = st.radio(
+        "Variable a comparar con el precio",
+        options=["renta_media_hogar", "poblacion_total", "total_vut"],
+        format_func=lambda x: {
+            "renta_media_hogar": "Renta media del hogar",
+            "poblacion_total": "Población total",
+            "total_vut": "Nº de viviendas de uso turístico (VUT)",
+        }[x],
+        horizontal=True,
+    )
+
+    # Aggregate by district first, matching the EDA methodology:
+    # correlating district-level medians, not individual listings,
+    # avoids diluting the signal with within-district price variance.
+    district_agg = (
+        df_filtered.groupby("neighbourhood_group")
+        .agg(price_mediano=("price", "median"), **{variable: (variable, "first")})
+        .dropna()
+        .reset_index()
+    )
+
+    if len(district_agg) < 3:
+        st.info("Selecciona al menos 3 distritos en el filtro para calcular la correlación.")
+    else:
+        fig_scatter = px.scatter(
+            district_agg,
+            x=variable,
+            y="price_mediano",
+            text="neighbourhood_group",
+            labels={
+                "price_mediano": "Precio mediano (€)",
+                variable: variable.replace("_", " ").title(),
+            },
+        )
+        fig_scatter.update_traces(textposition="top center")
+        st.plotly_chart(fig_scatter, use_container_width=True)
+
+        # --- Statistical test: Pearson correlation (district-level) ---
+        corr, p_value = pearsonr(district_agg[variable], district_agg["price_mediano"])
+
+        col1, col2 = st.columns(2)
+        col1.metric("Coeficiente de correlación (Pearson)", f"{corr:.2f}")
+        col2.metric("p-valor", f"{p_value:.2e}")
+
+        if p_value < 0.05:
+            direccion = "positiva" if corr > 0 else "negativa"
+            st.success(
+                f"La correlación es estadísticamente significativa (p < 0.05). "
+                f"Hay evidencia suficiente para afirmar que existe una relación {direccion} "
+                f"entre el precio mediano por distrito y esta variable."
+            )
+        else:
+            st.warning(
+                "No hay evidencia estadística suficiente (p ≥ 0.05) para afirmar "
+                "que existe una relación entre estas dos variables a nivel de distrito."
+            )
