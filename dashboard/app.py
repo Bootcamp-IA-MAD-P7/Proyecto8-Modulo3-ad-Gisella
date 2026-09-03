@@ -7,6 +7,7 @@ Entry point of the application.
 from pathlib import Path
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 # --- Page configuration ---
@@ -88,7 +89,26 @@ with tab_summary:
     st.dataframe(df_filtered.head(10))
 
 with tab_price:
-    st.write("Análisis de precios por distrito — próximo paso")
+    st.subheader("Distribución de precios por distrito")
+
+    # Order districts by median price (descending) for a clearer reading
+    order = (
+        df_filtered.groupby("neighbourhood_group")["price"]
+        .median()
+        .sort_values(ascending=False)
+        .index
+    )
+
+    fig_box = px.box(
+        df_filtered,
+        x="neighbourhood_group",
+        y="price",
+        category_orders={"neighbourhood_group": list(order)},
+        labels={"neighbourhood_group": "Distrito", "price": "Precio (€)"},
+    )
+    fig_box.update_layout(xaxis_tickangle=-45)
+
+    st.plotly_chart(fig_box, use_container_width=True)
 
 with tab_income:
     st.write("Relación precio vs renta/población — próximo paso")
