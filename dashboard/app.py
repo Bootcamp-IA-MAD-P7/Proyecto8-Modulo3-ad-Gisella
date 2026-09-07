@@ -170,3 +170,5 @@ with tab_income:
                 "No hay evidencia estadística suficiente (p ≥ 0.05) para afirmar "
                 "que existe una relación entre estas dos variables a nivel de distrito."
             )
+
+            

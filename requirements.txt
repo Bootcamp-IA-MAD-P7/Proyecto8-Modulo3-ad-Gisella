@@ -5,3 +5,4 @@ seaborn
 plotly
 jupyter
 streamlit 
+scipy
