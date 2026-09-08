@@ -21,14 +21,15 @@ insights que aporten valor de negocio a partir de los datos disponibles.
 
 ## Nivel de entrega alcanzado
 
-**Nivel Avanzado.** El proyecto incluye, además del EDA y el enriquecimiento
-de datos:
+**Nivel Avanzado, con clustering (K-Means) añadido para el nivel Experto.**
+El proyecto incluye, además del EDA y el enriquecimiento de datos:
 
 - Dashboard interactivo con filtros dinámicos (distrito, tipo de alojamiento,
   rango de precio)
 - Verificación de hipótesis mediante test estadístico (correlación de
   Pearson entre precio y variables socioeconómicas)
 - Containerización completa con Docker y Docker Compose
+- Segmentación de distritos mediante clustering (K-Means)
 
 ## Estructura del repositorio
 
@@ -37,7 +38,7 @@ Proyecto8-Modulo3-ad-Gisella/
 ├── data/
 │   ├── raw/          Datos originales sin procesar (no versionados)
 │   └── processed/    Datos limpios y enriquecidos, listos para el análisis
-├── notebooks/        Notebooks de Jupyter con la limpieza, el enriquecimiento y el EDA
+├── notebooks/        Notebooks de Jupyter con la limpieza, el enriquecimiento, el EDA y el clustering
 ├── docs/             Documentación del proyecto
 ├── src/              Funciones y scripts reutilizables
 ├── dashboard/        Dashboard interactivo (Streamlit + Plotly)
@@ -56,6 +57,7 @@ Proyecto8-Modulo3-ad-Gisella/
 - Jupyter Notebook — análisis exploratorio, limpieza y enriquecimiento de datos
 - Streamlit — dashboard interactivo
 - SciPy — test estadístico de correlación (Pearson)
+- Scikit-learn — clustering (K-Means) a nivel de distrito
 - Docker / Docker Compose — containerización y despliegue reproducible
 - Git / GitHub — control de versiones
 
@@ -96,8 +98,8 @@ pip install -r requirements.txt
 
 ```
 streamlit run dashboard/app.py
-```
 
+```
 La aplicación se abrirá en `http://localhost:8501`.
 
 ### Opción B: con Docker
