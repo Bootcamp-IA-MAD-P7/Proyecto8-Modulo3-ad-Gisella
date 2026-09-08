@@ -6,3 +6,4 @@ plotly
 jupyter
 streamlit 
 scipy
+scikit-learn==1.9.0
